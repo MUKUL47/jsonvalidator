@@ -13,6 +13,11 @@ object = {
     }
 }
 ```
+### installation
+```
+npm i anothersimplejsonvalidator
+console.log(require('anothersimplejsonvalidator')(1, {type : 'number'}))
+```
 
 ### schema syntax
 ```
