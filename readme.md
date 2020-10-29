@@ -1,4 +1,4 @@
-# A simple JSON validator.
+# <a href="https://www.npmjs.com/package/anothersimplejsonvalidator">A simple JSON validator.</a>
 
 ## Example
 
