@@ -1,5 +1,12 @@
 # <a href="https://www.npmjs.com/package/anothersimplejsonvalidator">A simple JSON validator.</a>
 
+```
+### installation
+```
+npm i anothersimplejsonvalidator
+console.log(require('anothersimplejsonvalidator')(1, {type : 'number'}))
+```
+
 ## Example
 
 ### object
@@ -12,12 +19,6 @@ object = {
         arr : []
     }
 }
-```
-### installation
-```
-npm i anothersimplejsonvalidator
-console.log(require('anothersimplejsonvalidator')(1, {type : 'number'}))
-```
 
 ### schema syntax
 ```
