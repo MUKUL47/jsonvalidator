@@ -4,7 +4,7 @@ const ex1S = { type : 'string' };
 try{
     simpleJsonValidator(ex1, ex1S,{ throwError : true })
 }catch(e){
-    // console.log(e) //Incorrect type expected 'string' but found 'array'
+    console.log(e) //Incorrect type expected 'string' but found 'array'
 }
 
 const ex2 = {
@@ -33,7 +33,7 @@ const ex2S = {
          },
     }
 }
-// simpleJsonValidator(ex2, ex2S) //true
+simpleJsonValidator(ex2, ex2S) //true
 
 const ex3 = {
     a : { d : 1 },
@@ -54,7 +54,7 @@ const ex3S = {
     }
 }
 
-// console.log(simpleJsonValidator(ex3, ex3S,{ throwError : true })) //Invalid type for property jsonSchema.property.a.property.d
+console.log(simpleJsonValidator(ex3, ex3S,{ throwError : true })) //Invalid type for property jsonSchema.property.a.property.d
 
 
 const ex4 = {
@@ -68,7 +68,7 @@ const ex4S = {
     }
 }
 
-// console.log(simpleJsonValidator(ex4, ex4S,{ throwError : true })) //Unexpected property 'c' found
+console.log(simpleJsonValidator(ex4, ex4S,{ throwError : true })) //Unexpected property 'c' found
 
 
 const ex5 = {
