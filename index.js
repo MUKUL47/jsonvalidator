@@ -1,7 +1,7 @@
 /**
  * @param {{...}} jsonObject : actual json object
  * @param {{...}} jsonSchema : schema of the desired object
- * @param {{throwError : boolean}} options : if enabled throw where validation failed else return true or false.
+ * @param {{throwError : boolean}} options : if enabled throw where validation failed else return true.
  */
 function simpleJsonValidator(jsonObject, jsonSchema, options){
     if(!jsonObject || !jsonSchema) {
@@ -51,12 +51,12 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
         let top = Object.assign({}, jsonSchema);
         let error;
         if(!top.property) {
-            return { error : true, message : `Property missing for schema` };
+            return { error : true, message : `Invalid root level property` };
         }
         this.level.forEach(lvl => {
             top = top.property[lvl]
             if(!top.property) {
-                error = { error : true, message : `Property missing for schema->${this.level.join('->')}` };
+                error = { error : true, message : `Property missing for '${this.level.join('.')}'` };
                 return;
             }
         });
@@ -69,14 +69,14 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
             let unknown = objectKeys.filter(key => !schemaKeys.includes(key))
             const props = unknown.length === 1 ? 'property' : 'properties';
             unknown = unknown.join(', ');
-            return { error : true, message : `Unexpected ${props} (${unknown}) found${levelMix}` }
+            return { error : true, message : `Unexpected ${props} '${unknown}' found${levelMix}` }
         }
         if(objectKeys.find(key => !schemaKeys.includes(key)) || schemaKeys.length !== objectKeys.length){
             //unknown property which is not mentioned in schema
             let missing = schemaKeys.filter(key => !objectKeys.includes(key));
             const props = missing.length === 1 ? 'property' : 'properties';
             missing = missing.join(', ');
-            return { error : true, message : `${props} (${missing}) missing${levelMix}` }
+            return { error : true, message : `${props} '${missing}' missing${levelMix}` }
         }
         return true;
     };
@@ -87,10 +87,10 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
         };
         const schemaType = checkVal(schemaNested);
         if(!schemaType){
-            return { error : `Invalid type for : ${originalType.val}` }
+            return { error : `Invalid type for property ${schemaNested.replace('.type','')}` }
         }
         if(originalType.type !== schemaType){
-            return { error : `Incorrect type for ${originalType.val}, expected '${schemaType}' but found '${originalType.type}'` }
+            return { error : `Incorrect type for ${originalType.val}, expected type '${schemaType}' but found '${originalType.type}'` }
         }
         return true;
     }
@@ -111,6 +111,14 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
     this.iterating = true;
     this.level = [];
     this.jsC;
+    if(jsonSchema.type !== 'object' || Array.isArray(jsonObject)){
+        if(typeof jsonObject === jsonSchema.type && !Array.isArray(jsonObject))return true;
+        else if(jsonSchema.type === 'array' && Array.isArray(jsonObject)) return true;
+        if(enableError){
+            throw Error(`Incorrect type expected '${jsonSchema.type}' but found '${Array.isArray(jsonObject) ? 'array' : typeof jsonObject}'`);
+        }
+        return false;
+    }
     while(this.iterating){
         this.jsC = this.getNestedObject();
         this.key = Object.keys(this.jsC)[0]
@@ -149,15 +157,15 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
 }
 const js = {
     name : 'john',
-    name2 :'john',
+    name2 : 'john',
 };
 const schema = {
     type : 'object',
     property : {
         name : { type : 'string' },
-        name2 : {type : 'string'
-        }
+        name2 : {}
     }
 }
-const response = simpleJsonValidator(js,schema, { throwError : !true });
-console.log(response)
+module.exports = simpleJsonValidator;
+// const response = simpleJsonValidator(js,schema, { throwError : true });
+// console.log(response)
