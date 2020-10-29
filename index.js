@@ -155,17 +155,4 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
     if(errT) return false;
     return true;
 }
-const js = {
-    name : 'john',
-    name2 : 'john',
-};
-const schema = {
-    type : 'object',
-    property : {
-        name : { type : 'string' },
-        name2 : {}
-    }
-}
 module.exports = simpleJsonValidator;
-// const response = simpleJsonValidator(js,schema, { throwError : true });
-// console.log(response)
