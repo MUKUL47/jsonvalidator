@@ -8,6 +8,7 @@ console.log(require('anothersimplejsonvalidator')(1, {type : 'number'}))
 ```
 
 ### object
+
 ```
 object = {
     someNumber : 10,
@@ -17,8 +18,9 @@ object = {
         arr : []
     }
 }
-
+```
 ### schema syntax
+
 ```
 schema = {
     type : 'object',
@@ -37,6 +39,7 @@ schema = {
 ```
 
 ### options
+
 ```
 simpleJsonValidator(object, schema, { throwError : true }) //will throw an error if validation failed
 simpleJsonValidator(object, schema) //will simply return true or false
