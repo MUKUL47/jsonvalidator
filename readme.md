@@ -1,13 +1,11 @@
-# <a href="https://www.npmjs.com/package/anothersimplejsonvalidator">A simple JSON validator.</a>
+# <a href="https://www.npmjs.com/package/anothersimplejsonvalidator" target="_blank">A simple JSON validator.</a>
 
-```
 ### installation
+
 ```
 npm i anothersimplejsonvalidator
 console.log(require('anothersimplejsonvalidator')(1, {type : 'number'}))
 ```
-
-## Example
 
 ### object
 ```
