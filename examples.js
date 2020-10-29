@@ -73,7 +73,6 @@ console.log(simpleJsonValidator(ex4, ex4S,{ throwError : true })) //Unexpected p
 
 const ex5 = {
     b : false,
-    c : { }
 }
 const ex5S = {
     type : 'object',
