@@ -8,11 +8,11 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
         throw Error('JSONobject or JSONschema not found')
     }
     this.getNestedObject = () => {
-        if(level.length === 0) return Object.assign({},js);
+        if(level.length === 0) return Object.assign({},this.jsonObject);
         return eval(`this.jsonObject.${level.join('.')}`)
     };
     this.getNestedType = (key) => {
-        if(level.length === 0) return js[key];
+        if(level.length === 0) return this.jsonObject[key];
         return eval(`this.jsonObject.${[...level, key].join('.')}`)
     };
     this.filterOriginalObj = (key) => {
@@ -27,7 +27,7 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
                 return false;
             }
         }
-        else if(typeof getNestedType(key) === 'object' && Array.isArray(eval(getNestedProperty(key)))){
+        else if(typeof getNestedType(key) === 'object' && !Array.isArray(eval(getNestedProperty(key)))){
             this.level.push(key);
         }else {
             if(this.level.length === 0){
@@ -48,7 +48,6 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
         return `${schema ? schema : 'this.jsonObject'}${this.level.length > 0 ? `.${this.level.join('.')}` : ''}${key?`.${key}`:''}`
     }
     this.validateSchema = (keys) => {
-        console.log(keys)
         let top = Object.assign({}, jsonSchema);
         let error;
         if(!top.property) {
@@ -64,7 +63,6 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
         if(error) return error;
         const schemaKeys = Object.keys(top.property)
         const objectKeys = keys;
-        console.log(schemaKeys, objectKeys)
         const levelMix = this.level.length > 0 ? ` in '${this.level.join('.')}'` : '';
         if(schemaKeys.length < objectKeys.length){
             //unexpected property in main object
@@ -134,7 +132,6 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
         }
         this.iterating = this.filterOriginalObj(key)
     };
-    console.log('_')
     this.visitedNodes.pop();
     let errT = false;
     this.visitedNodes.forEach((v, i) => {
@@ -152,21 +149,15 @@ function simpleJsonValidator(jsonObject, jsonSchema, options){
 }
 const js = {
     name : 'john',
-    name2 : {
-        d : 2
-    }
+    name2 :'john',
 };
 const schema = {
     type : 'object',
     property : {
         name : { type : 'string' },
-        name2 : {
-            type : 'object',
-            property : {
-                c : '2'
-            }
+        name2 : {type : 'string'
         }
     }
 }
-const response = simpleJsonValidator(js,schema, { throwError : true });
+const response = simpleJsonValidator(js,schema, { throwError : !true });
 console.log(response)
