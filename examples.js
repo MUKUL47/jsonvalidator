@@ -106,4 +106,4 @@ const ex6S = {
 
     }
 }
-console.log(simpleJsonValidator(ex6, ex6S, { throwError: true })) //property 'd' missing in 'c'
+console.log(simpleJsonValidator(ex6, ex6S, { throwError: true }))// 'jsonObject.arr' length is greator than expected maximum length = 3
