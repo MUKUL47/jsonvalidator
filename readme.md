@@ -44,3 +44,13 @@ schema = {
 simpleJsonValidator(object, schema, { throwError : true }) //will throw an error if validation failed
 simpleJsonValidator(object, schema) //will simply return true or false
 ```
+
+
+### Optional custom validators
+
+type | property | example
+--- | --- | ---
+string | regex | { type : 'string', regex : /myEmail@gmail.com/ } 
+boolean | expected |  { type : 'string', expected : false } 
+number | min, max | { type : 'number', min : 5, max : 10000 }  
+array | minLength, maxLength | { type : 'array', maxLength : 20 }  
