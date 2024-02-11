@@ -1,56 +1,82 @@
-# <a href="https://www.npmjs.com/package/anothersimplejsonvalidator" target="_blank">A simple JSON validator.</a>
+# <a href="https://www.npmjs.com/package/anothersimplejsonvalidator" target="_blank">Deep Level JSON Validator</a>
 
-### installation
+A comprehensive tool for validating complex JSON structures
 
-```
-npm i anothersimplejsonvalidator
-console.log(require('anothersimplejsonvalidator')(1, {type : 'number'}))
-```
+## Overview
 
-### object
+This validator offers thorough validation of JSON data, ensuring it conforms to specified schemas. It supports nested structures, various data types, custom validation rules, and flexible error handling.
 
-```
-object = {
-    someNumber : 10,
-    someBool : false,
-    anotherObject : {
-        someStr : 'John Doe,
-        arr : []
-    }
-}
-```
-### schema syntax
+## Key Features
 
-```
-schema = {
-    type : 'object',
-    property : {
-        someNumber : { type : 'number' },
-        someBool : { type : 'boolean' },
-        anotherObject : {
-            type : 'object',
-            property : {
-                someStr : { type : 'string' },
-                arr : { type : 'array' }
-            }
-        }
-    }
-}
-```
+- **Deep Validation:** Validates nested objects and arrays, ensuring data integrity at every level.
+- **Flexible Schema Definition:** Defines schemas using a type-safe, declarative API, covering diverse data types like strings, numbers, booleans, objects, arrays, and more.
+- **Custom Validation Rules:** Enforces specific validation logic with regular expressions for strings and minimum/maximum length for arrays.
+- **Error Handling:** Provides informative error messages with detailed context for easy debugging, including error types, locations, expected values, and schema details.
+- **Exception Handling:** Optionally throws errors for immediate interruption of validation upon encountering invalid data.
 
-### options
+## Usage
 
-```
-simpleJsonValidator(object, schema, { throwError : true }) //will throw an error if validation failed
-simpleJsonValidator(object, schema) //will simply return true or false
-```
+1. **Import the validator:**
 
+   ```javascript
+   import { JsonValidator, Schema } from "anothersimplejsonvalidator";
+   ```
 
-### Optional custom validators
+2. **Define the schema:**
 
-type | property | example
---- | --- | ---
-string | regex | { type : 'string', regex : /myEmail@gmail.com/ } 
-boolean | expected |  { type : 'string', expected : false } 
-number | min, max | { type : 'number', min : 5, max : 10000 }  
-array | minLength, maxLength | { type : 'array', maxLength : 20 }  
+   ```javascript
+   const schema = Schema.object({
+     id: Schema.string().required(),
+     name: Schema.string().required(),
+     details: Schema.object({
+       price: Schema.number().required(),
+       ratings: Schema.array(
+         Schema.object({
+           rating: Schema.number().required(),
+           comment: Schema.string(),
+         }).required()
+       ),
+     }).required(),
+     tags: Schema.array(Schema.string()),
+   }).required();
+   ```
+
+3. **Create a validator instance:**
+
+   ```javascript
+   const validator = new JsonValidator({
+     schema,
+     throwError: true, // Optional: Throw errors on invalid data
+   });
+   ```
+
+4. **Validate JSON data:**
+
+   ```javascript
+   const data = {
+     // ... your JSON data
+   };
+
+   const validationResult = validator.validate(data);
+
+   if (validationResult === true) {
+     // Data is valid
+   } else {
+     // Handle errors
+     console.error(validationResult); // Array of ErrorController objects
+   }
+   ```
+
+## Error Handling
+
+The `validate` method returns either `true` if the data is valid, or an array of `ErrorController` objects containing detailed error information.
+
+## Additional Information
+
+- **Supported Data Types:** string, number, object, array, boolean, and any.
+- **Error Types:** Unexpected, Expected, MissingKeys, MissingTypes, Exception, StringRegexMissmatch, NumberMinExpected, NumberMaxExpected.
+- **Custom Validation Rules:** Regular expressions for strings, minimum/maximum length for arrays.
+
+## License
+
+MIT
