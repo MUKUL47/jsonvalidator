@@ -1,3 +1,5 @@
+import { JsonValidator } from "./core/json-validator";
+import { Schema as V } from "./schema";
 let a = new JsonValidator({
   schema: V.object({
     level1: V.object({

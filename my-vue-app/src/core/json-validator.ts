@@ -135,7 +135,7 @@ class JsonValidator {
       const currentSchemaTypes =
         this.schemaInstance.schemaData[key]?.map((v) => v?.type || "") || [];
       if (!dataType) {
-        if (currentSchemaTypes[0] === DataType.ANY) continue;
+        if (currentSchemaTypes.includes(DataType.ANY)) continue;
         return this.collectErrors({
           type: ErrorType.Expected,
           found: child.type,
