@@ -7,7 +7,6 @@ class ObjectType extends Type<DataType.OBJECT> {
       throw new Error("[ObjectType] only accept object argument(s)");
     }
     const children: TypeData<DataType>[] = [];
-    // const values = Object.values(records);
     for (let k in records) {
       children.push({ ...records[k], name: k } as TypeData<any>);
     }
@@ -22,7 +21,7 @@ class StringType extends Type<DataType.STRING> {
   constructor() {
     super(DataType.STRING);
   }
-  shouldMatch(reg: RegExp): this {
+  shouldMatch(...reg: RegExp[]): this {
     this.value.shouldMatch = reg;
     return this;
   }
@@ -41,6 +40,17 @@ class ArrayType extends Type<DataType.ARRAY> {
   constructor(children: TypeData<DataType>[] = []) {
     super(DataType.ARRAY);
     this.value.children = children.length === 0 ? [new AnyType()] : children;
+    const duplicateMap = new Map<DataType, true>();
+    if (children.length > 1) {
+      children.forEach((child) => {
+        if (duplicateMap.has(child.value?.type as DataType)) {
+          throw new Error(
+            `[ArrayType] duplicate types not allowed in array : ${child.value?.type}`
+          );
+        }
+        duplicateMap.set(child.value?.type as DataType, true);
+      });
+    }
   }
 
   min(min: Number): this {

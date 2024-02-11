@@ -33,11 +33,12 @@ class JsonValidator {
 
   validate(node: Object | Array<any>): true | ErrorController[] {
     this.validateNode(this.parseObject(node));
-    if (!!this.errors.length) return true;
+    if (this.errors.length === 0) return true;
     return this.errors;
   }
 
   parseObject(node: Object | Array<any>) {
+    //this step is not required recursive visit all node along side validation
     const tree: JSONObjectType = {
       children: [],
       type: Array.isArray(node) ? DataType.ARRAY : typeof node,
@@ -87,16 +88,25 @@ class JsonValidator {
       prefix === SchemaValidator.prefix &&
       this.schemaInstance.schemaData[prefix][0].type != node.type
     ) {
-      console.log(
-        this.collectErrors({
-          type: ErrorType.Expected,
-          found: node.type,
-          location: prefix,
-          key:
-            this.schemaInstance.schemaData[prefix]?.map((v) => v?.type || "") ||
-            [],
-        })
-      );
+      this.collectErrors({
+        type: ErrorType.Expected,
+        found: node.type,
+        location: prefix,
+        key:
+          this.schemaInstance.schemaData[prefix]?.map((v) => v?.type || "") ||
+          [],
+        example: this.schemaInstance.schemaData[prefix][0].example,
+      });
+    }
+    if (this.schemaInstance.schemaData[prefix][0].type === DataType.ARRAY) {
+      this.checkArrayType({
+        type: this.schemaInstance.schemaData[
+          prefix
+        ][0] as TypeValue<DataType.ARRAY>,
+        child: node,
+        key_index: prefix,
+        prefix,
+      });
     }
     const recursiveChildren = [];
     const objectKeys: (String | DataType)[] = [];
@@ -120,14 +130,11 @@ class JsonValidator {
         !this.schemaInstance.schemaData[key] &&
         !this.unknownFields.has(prefix)
       ) {
-        // throw `Unexpected key ${key_index} at ${prefix}`;
-        console.log(
-          this.collectErrors({
-            type: ErrorType.Unexpected,
-            location: prefix,
-            key: [key_index],
-          })
-        );
+        return this.collectErrors({
+          type: ErrorType.Unexpected,
+          location: prefix,
+          key: [key_index],
+        });
       }
       const dataType = this.schemaInstance.schemaData[key]?.find(
         (schemaData) => schemaData.type == child.type
@@ -145,9 +152,25 @@ class JsonValidator {
       }
       // const defaultKey = `${prefix}.${DEFAULT}`;
       // const originalKey = `${prefix_index}.${DEFAULT_INDEX}`;
+      if (dataType.type === DataType.STRING) {
+        this.checkStringType({
+          type: dataType as TypeValue<DataType.STRING>,
+          child,
+          key_index,
+          prefix,
+        });
+      }
       if (
         [DataType.ARRAY, DataType.OBJECT].includes(dataType.type as DataType)
       ) {
+        if (dataType.type === DataType.ARRAY) {
+          this.checkArrayType({
+            type: dataType as TypeValue<DataType.ARRAY>,
+            child,
+            key_index,
+            prefix,
+          });
+        }
         recursiveChildren.push([child, key, key_index]);
       }
       objectKeys.push(
@@ -194,9 +217,67 @@ class JsonValidator {
     );
   }
 
-  private collectErrors(props: ErrorControllerType) {
-    if (this.throwError) throw new ErrorController(props);
-    this.errors.push(new ErrorController(props));
+  private checkArrayType({
+    type,
+    child,
+    key_index,
+    prefix,
+  }: {
+    type: TypeValue<DataType.ARRAY>;
+    child: JSONObjectType;
+    key_index: string;
+    prefix: string;
+  }) {
+    const errors: ErrorType[] = [];
+    const errorParams = {
+      key: [key_index],
+      location: prefix,
+      example: type.example,
+    };
+    if (!!type.max && !isNaN(+type.max) && child.children.length > +type.max) {
+      errors.push(ErrorType.NumberMaxExpected);
+    } else if (
+      !!type.min &&
+      !isNaN(+type.min) &&
+      child.children.length < +type.min
+    ) {
+      errors.push(ErrorType.NumberMinExpected);
+    }
+    errors.forEach((e) =>
+      this.collectErrors({ ...errorParams, type: e }, type)
+    );
+  }
+
+  private checkStringType({
+    type,
+    child,
+    key_index,
+    prefix,
+  }: {
+    type: TypeValue<DataType.STRING>;
+    child: JSONObjectType;
+    key_index: string;
+    prefix: string;
+  }) {
+    if (
+      !!type.shouldMatch &&
+      !!!type.shouldMatch.some((r) => r.test(child.value.toString()))
+    ) {
+      this.collectErrors({
+        key: [key_index],
+        location: prefix,
+        type: ErrorType.StringRegexMissmatch,
+        example: type.example,
+      });
+    }
+  }
+
+  private collectErrors(
+    props: ErrorControllerType,
+    type?: TypeValue<DataType>
+  ) {
+    if (this.throwError) throw new ErrorController(props, type);
+    this.errors.push(new ErrorController(props, type));
   }
 }
 export { JsonValidator };

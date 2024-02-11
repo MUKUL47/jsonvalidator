@@ -12,7 +12,7 @@ export type TypeValue<T extends DataType> = {
   required: undefined | boolean;
   example?: any;
   name?: string;
-} & (T extends DataType.STRING ? { shouldMatch?: RegExp } : {}) &
+} & (T extends DataType.STRING ? { shouldMatch?: RegExp[] } : {}) &
   (T extends DataType.OBJECT | DataType.ARRAY
     ? { children?: TypeData<DataType>[] }
     : {}) &
@@ -35,6 +35,11 @@ export class Type<T extends DataType> {
 
   required(): this {
     this.value.required = true;
+    return this;
+  }
+
+  example(v: any): this {
+    this.value.example = v;
     return this;
   }
 }

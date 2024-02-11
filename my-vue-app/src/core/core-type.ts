@@ -19,6 +19,10 @@ export enum ErrorType {
   Expected = "expected",
   MissingKeys = "missing_keys",
   MissingTypes = "missing_types",
+  Exception = "exception",
+  StringRegexMissmatch = "string_regex_missmatch",
+  NumberMinExpected = "number_min_length",
+  NumberMaxExpected = "number_max_length",
 }
 
 export type ErrorControllerType = {
@@ -26,4 +30,6 @@ export type ErrorControllerType = {
   key: String[];
   location: String;
   found?: String;
+  message?: any;
+  example?: any;
 };
