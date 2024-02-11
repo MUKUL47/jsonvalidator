@@ -1,5 +1,4 @@
 import { ErrorControllerType, ErrorType } from "./core-type";
-
 export class ErrorController {
   type: ErrorType;
   key: String[];

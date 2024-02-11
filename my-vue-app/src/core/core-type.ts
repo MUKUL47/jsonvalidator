@@ -1,8 +1,8 @@
-import { Schema } from "../schema";
 import { DataType, Type } from "../schema/type-core";
 
-export type SchemaValidatorProps = {
+export type ValidatorProps = {
   schema: Type<DataType.OBJECT | DataType.ARRAY>;
+  throwError?: boolean;
 };
 
 export interface JSONObjectType {

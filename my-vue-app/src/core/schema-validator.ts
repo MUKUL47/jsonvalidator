@@ -1,5 +1,4 @@
 import { DataType, Type, TypeData, TypeValue } from "../schema/type-core";
-import { SchemaValidatorProps } from "./core-type";
 import { union } from "./util";
 
 export class SchemaValidator {
@@ -11,8 +10,8 @@ export class SchemaValidator {
     { type: DataType | undefined; required: boolean }[]
   > = new Map();
   private _union: Record<any, Partial<TypeValue<any>>[]>;
-  constructor(props: SchemaValidatorProps) {
-    this._schema = props.schema;
+  constructor(schema: Type<DataType.OBJECT | DataType.ARRAY>) {
+    this._schema = schema;
     if (![DataType.OBJECT, DataType.ARRAY].includes(this._schema.value.type)) {
       throw new Error("Can only validate Object(s) or Array(s)");
     }

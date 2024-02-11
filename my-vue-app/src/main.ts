@@ -1,6 +1,3 @@
-import { JsonValidator } from "./core/json-validator";
-import { SchemaValidator } from "./core/schema-validator";
-import { Schema as V } from "./schema";
 let a = new JsonValidator({
   schema: V.object({
     level1: V.object({
@@ -15,4 +12,4 @@ let a = new JsonValidator({
       .required(),
   }),
 });
-console.log(a.validate({}));
+console.log(a.validate({ level1: { v: { s: [2, { s: 2 }] }, d: 2 } }));

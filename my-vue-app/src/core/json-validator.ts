@@ -1,13 +1,21 @@
 import { DataType, TypeValue } from "../schema/type-core";
-import { ErrorType, JSONObjectType, SchemaValidatorProps } from "./core-type";
+import {
+  ErrorControllerType,
+  ErrorType,
+  JSONObjectType,
+  ValidatorProps,
+} from "./core-type";
 import { ErrorController } from "./error-controller";
 import { SchemaValidator } from "./schema-validator";
 
 class JsonValidator {
   private schemaInstance: SchemaValidator;
   private unknownFields = new Set<String>();
-  constructor({ schema }: SchemaValidatorProps) {
-    this.schemaInstance = new SchemaValidator({ schema });
+  private errors: ErrorController[] = [];
+  private throwError = false;
+  constructor({ schema, throwError }: ValidatorProps) {
+    this.schemaInstance = new SchemaValidator(schema);
+    this.throwError = !!throwError;
     this.initialize();
   }
 
@@ -23,8 +31,10 @@ class JsonValidator {
     }
   }
 
-  validate(node: Object | Array<any>) {
+  validate(node: Object | Array<any>): true | ErrorController[] {
     this.validateNode(this.parseObject(node));
+    if (!!this.errors.length) return true;
+    return this.errors;
   }
 
   parseObject(node: Object | Array<any>) {
@@ -78,7 +88,7 @@ class JsonValidator {
       this.schemaInstance.schemaData[prefix][0].type != node.type
     ) {
       console.log(
-        new ErrorController({
+        this.collectErrors({
           type: ErrorType.Expected,
           found: node.type,
           location: prefix,
@@ -87,10 +97,6 @@ class JsonValidator {
             [],
         })
       );
-      // throw `Expected ${this.schemaInstance.schemaData[prefix]
-      //   ?.map((v) => v.type)
-      //   .join(" or ")
-      //   .trim()} but found ${node.type} at ${prefix}`;
     }
     const recursiveChildren = [];
     const objectKeys: (String | DataType)[] = [];
@@ -116,7 +122,7 @@ class JsonValidator {
       ) {
         // throw `Unexpected key ${key_index} at ${prefix}`;
         console.log(
-          new ErrorController({
+          this.collectErrors({
             type: ErrorType.Unexpected,
             location: prefix,
             key: [key_index],
@@ -130,21 +136,15 @@ class JsonValidator {
         this.schemaInstance.schemaData[key]?.map((v) => v?.type || "") || [];
       if (!dataType) {
         if (currentSchemaTypes[0] === DataType.ANY) continue;
-        // throw `Expected ${currentSchemaTypes.join(" or ").trim()} but found ${
-        //   child.type
-        // } at ${key_index}`;
-        console.log(
-          new ErrorController({
-            type: ErrorType.Expected,
-            found: child.type,
-            location: key_index,
-            key: currentSchemaTypes,
-          })
-        );
-        return;
+        return this.collectErrors({
+          type: ErrorType.Expected,
+          found: child.type,
+          location: key_index,
+          key: currentSchemaTypes,
+        });
       }
-      const defaultKey = `${prefix}.${DEFAULT}`;
-      const originalKey = `${prefix_index}.${DEFAULT_INDEX}`;
+      // const defaultKey = `${prefix}.${DEFAULT}`;
+      // const originalKey = `${prefix_index}.${DEFAULT_INDEX}`;
       if (
         [DataType.ARRAY, DataType.OBJECT].includes(dataType.type as DataType)
       ) {
@@ -166,13 +166,11 @@ class JsonValidator {
         (obj) => !objectKeys.includes(obj.type!)
       );
       if (missingKeys.length) {
-        console.log(
-          new ErrorController({
-            key: missingKeys.map((v) => v?.type || "{$}"),
-            location: prefix,
-            type: ErrorType.MissingTypes,
-          })
-        );
+        this.collectErrors({
+          key: missingKeys.map((v) => v?.type || "{$}"),
+          location: prefix,
+          type: ErrorType.MissingTypes,
+        });
       }
     } else {
       const filteredRequiredKeys =
@@ -184,18 +182,21 @@ class JsonValidator {
         (obj) => !objectKeys.includes((obj as any).name)
       );
       if (missingKeys.length) {
-        console.log(
-          new ErrorController({
-            key: missingKeys.map((v) => (v as any).name),
-            location: prefix_index,
-            type: ErrorType.MissingKeys,
-          })
-        );
+        this.collectErrors({
+          key: missingKeys.map((v) => (v as any).name),
+          location: prefix_index,
+          type: ErrorType.MissingKeys,
+        });
       }
     }
     recursiveChildren.forEach(([c, childPrefix, key_index]) =>
       this.validateNode(c as any, childPrefix as any, key_index as any)
     );
+  }
+
+  private collectErrors(props: ErrorControllerType) {
+    if (this.throwError) throw new ErrorController(props);
+    this.errors.push(new ErrorController(props));
   }
 }
 export { JsonValidator };

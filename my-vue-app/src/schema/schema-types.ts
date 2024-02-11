@@ -40,7 +40,7 @@ class AnyType extends Type<DataType.ANY> {
 class ArrayType extends Type<DataType.ARRAY> {
   constructor(children: TypeData<DataType>[] = []) {
     super(DataType.ARRAY);
-    this.value.children = children;
+    this.value.children = children.length === 0 ? [new AnyType()] : children;
   }
 
   min(min: Number): this {
