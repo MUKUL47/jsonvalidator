@@ -1,5 +1,6 @@
 import { DataType, TypeValue } from "../schema/type-core";
 import {
+  CheckType,
   ErrorControllerType,
   ErrorType,
   JSONObjectType,
@@ -22,10 +23,8 @@ class JsonValidator {
   private initialize() {
     const schema = this.schemaInstance.schemaData;
     for (let k in schema) {
-      if (
-        schema[k].length === 1 &&
-        !!(schema[k]?.[0] as TypeValue<DataType.OBJECT>).allowUnknown
-      ) {
+      const type = schema[k].find((v) => v.type === DataType.OBJECT);
+      if (!!type && (type as TypeValue<DataType.OBJECT>).allowUnknown) {
         this.unknownFields.add(k);
       }
     }
@@ -37,7 +36,7 @@ class JsonValidator {
     return this.errors;
   }
 
-  parseObject(node: Object | Array<any>) {
+  private parseObject(node: Object | Array<any>) {
     //this step is not required recursive visit all node along side validation
     const tree: JSONObjectType = {
       children: [],
@@ -213,7 +212,11 @@ class JsonValidator {
       }
     }
     recursiveChildren.forEach(([c, childPrefix, key_index]) =>
-      this.validateNode(c as any, childPrefix as any, key_index as any)
+      this.validateNode(
+        c as JSONObjectType,
+        childPrefix as string,
+        key_index as string
+      )
     );
   }
 
@@ -222,12 +225,7 @@ class JsonValidator {
     child,
     key_index,
     prefix,
-  }: {
-    type: TypeValue<DataType.ARRAY>;
-    child: JSONObjectType;
-    key_index: string;
-    prefix: string;
-  }) {
+  }: CheckType<DataType.ARRAY>) {
     const errors: ErrorType[] = [];
     const errorParams = {
       key: [key_index],
@@ -253,12 +251,7 @@ class JsonValidator {
     child,
     key_index,
     prefix,
-  }: {
-    type: TypeValue<DataType.STRING>;
-    child: JSONObjectType;
-    key_index: string;
-    prefix: string;
-  }) {
+  }: CheckType<DataType.STRING>) {
     if (
       !!type.shouldMatch &&
       !!!type.shouldMatch.some((r) => r.test(child.value.toString()))

@@ -1,4 +1,4 @@
-import { DataType, Type } from "../schema/type-core";
+import { DataType, Type, TypeValue } from "../schema/type-core";
 
 export type ValidatorProps = {
   schema: Type<DataType.OBJECT | DataType.ARRAY>;
@@ -32,4 +32,11 @@ export type ErrorControllerType = {
   found?: String;
   message?: any;
   example?: any;
+};
+
+export type CheckType<T extends DataType> = {
+  type: TypeValue<T>;
+  child: JSONObjectType;
+  key_index: string;
+  prefix: string;
 };

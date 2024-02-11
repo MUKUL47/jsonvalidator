@@ -1,4 +1,4 @@
-import { DataType, Type, TypeData, TypeValue } from "./type-core";
+import { DataType, Type, TypeData } from "./type-core";
 
 class ObjectType extends Type<DataType.OBJECT> {
   constructor(records: Partial<Record<any, Type<DataType>>> = {}) {
@@ -68,4 +68,4 @@ class BooleanType extends Type<DataType.BOOLEAN> {
   }
 }
 
-export { AnyType, ArrayType, ObjectType, NumberType, StringType, BooleanType };
+export { AnyType, ArrayType, BooleanType, NumberType, ObjectType, StringType };
