@@ -7,7 +7,7 @@ export class SchemaValidator {
   private schemaNodes: [String, Partial<Type<any>>][] = [];
   private _objectKeysMap: Map<
     String,
-    { type: DataType | undefined; required: boolean }[]
+    { name?: string; type: DataType | undefined; required: boolean }[]
   > = new Map();
   private _union: Record<any, Partial<TypeValue<any>>[]>;
   constructor(schema: Type<DataType.OBJECT | DataType.ARRAY>) {

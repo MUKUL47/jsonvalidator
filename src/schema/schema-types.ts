@@ -3,7 +3,7 @@ import { DataType, Type, TypeData } from "./type-core";
 class ObjectType extends Type<DataType.OBJECT> {
   constructor(records: Partial<Record<any, Type<DataType>>> = {}) {
     super(DataType.OBJECT);
-    if (typeof records !== "object") {
+    if (typeof records !== "object" || Array.isArray(records)) {
       throw new Error("[ObjectType] only accept object argument(s)");
     }
     const children: TypeData<DataType>[] = [];

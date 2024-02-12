@@ -109,8 +109,6 @@ class JsonValidator {
     }
     const recursiveChildren = [];
     const objectKeys: (String | DataType)[] = [];
-    if (children.length === 0) {
-    }
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
       const DEFAULT =
@@ -135,12 +133,12 @@ class JsonValidator {
           key: [key_index],
         });
       }
-      const dataType = this.schemaInstance.schemaData[key]?.find(
+      const schemaDataType = this.schemaInstance.schemaData[key]?.find(
         (schemaData) => schemaData.type == child.type
       );
       const currentSchemaTypes =
         this.schemaInstance.schemaData[key]?.map((v) => v?.type || "") || [];
-      if (!dataType) {
+      if (!schemaDataType) {
         if (currentSchemaTypes.includes(DataType.ANY)) continue;
         return this.collectErrors({
           type: ErrorType.Expected,
@@ -149,22 +147,22 @@ class JsonValidator {
           key: currentSchemaTypes,
         });
       }
-      // const defaultKey = `${prefix}.${DEFAULT}`;
-      // const originalKey = `${prefix_index}.${DEFAULT_INDEX}`;
-      if (dataType.type === DataType.STRING) {
+      if (schemaDataType.type === DataType.STRING) {
         this.checkStringType({
-          type: dataType as TypeValue<DataType.STRING>,
+          type: schemaDataType as TypeValue<DataType.STRING>,
           child,
           key_index,
           prefix,
         });
       }
       if (
-        [DataType.ARRAY, DataType.OBJECT].includes(dataType.type as DataType)
+        [DataType.ARRAY, DataType.OBJECT].includes(
+          schemaDataType.type as DataType
+        )
       ) {
-        if (dataType.type === DataType.ARRAY) {
+        if (schemaDataType.type === DataType.ARRAY) {
           this.checkArrayType({
-            type: dataType as TypeValue<DataType.ARRAY>,
+            type: schemaDataType as TypeValue<DataType.ARRAY>,
             child,
             key_index,
             prefix,
@@ -181,13 +179,13 @@ class JsonValidator {
     const isArray = node.type === DataType.ARRAY;
     if (isArray) {
       const arrayKey = `${prefix}._`;
-      const filteredRequiredKeys = this.schemaInstance.schemaData[
-        arrayKey
-      ].filter((k) => k.required);
-      const missingKeys = filteredRequiredKeys.filter(
-        (obj) => !objectKeys.includes(obj.type!)
+      const missingKeys = this.schemaInstance.schemaData[arrayKey].filter(
+        (obj) =>
+          !objectKeys.includes(obj.type) &&
+          !!obj.required &&
+          ![DataType.ANY].includes(obj.type)
       );
-      if (missingKeys.length) {
+      if (missingKeys.length > 0) {
         this.collectErrors({
           key: missingKeys.map((v) => v?.type || "{$}"),
           location: prefix,
@@ -195,15 +193,16 @@ class JsonValidator {
         });
       }
     } else {
-      const filteredRequiredKeys =
+      const missingKeys =
         this.schemaInstance.objectKeysMap
           .get(prefix)
-          ?.filter((k) => k.required) || [];
-
-      const missingKeys = filteredRequiredKeys.filter(
-        (obj) => !objectKeys.includes((obj as any).name)
-      );
-      if (missingKeys.length) {
+          ?.filter(
+            (obj) =>
+              !objectKeys.includes(obj.name) &&
+              !!obj.required &&
+              ![DataType.ANY].includes(obj.type)
+          ) ?? [];
+      if (missingKeys.length > 0) {
         this.collectErrors({
           key: missingKeys.map((v) => (v as any).name),
           location: prefix_index,
