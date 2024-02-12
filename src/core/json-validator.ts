@@ -31,6 +31,7 @@ class JsonValidator {
   }
 
   validate(node: Object | Array<any>): true | ErrorController[] {
+    this.errors = [];
     this.validateNode(this.parseObject(node));
     if (this.errors.length === 0) return true;
     return this.errors;
@@ -198,7 +199,7 @@ class JsonValidator {
           .get(prefix)
           ?.filter(
             (obj) =>
-              !objectKeys.includes(obj.name) &&
+              !objectKeys.includes((obj as any)?.name) &&
               !!obj.required &&
               ![DataType.ANY].includes(obj.type)
           ) ?? [];

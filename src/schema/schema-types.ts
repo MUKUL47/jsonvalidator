@@ -16,6 +16,10 @@ class ObjectType extends Type<DataType.OBJECT> {
     this.value.allowUnknown = true;
     return this;
   }
+
+  setNestedRequired() {
+    this.value.nestedRequired = true;
+  }
 }
 class StringType extends Type<DataType.STRING> {
   constructor() {
@@ -59,6 +63,11 @@ class ArrayType extends Type<DataType.ARRAY> {
   }
   max(max: Number): this {
     this.value.max = max;
+    return this;
+  }
+
+  setNestedRequired(): this {
+    this.value.nestedRequired = true;
     return this;
   }
 }

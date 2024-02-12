@@ -7,7 +7,7 @@ export class SchemaValidator {
   private schemaNodes: [String, Partial<Type<any>>][] = [];
   private _objectKeysMap: Map<
     String,
-    { name?: string; type: DataType | undefined; required: boolean }[]
+    { type: DataType | undefined; required: boolean }[]
   > = new Map();
   private _union: Record<any, Partial<TypeValue<any>>[]>;
   constructor(schema: Type<DataType.OBJECT | DataType.ARRAY>) {
@@ -16,7 +16,12 @@ export class SchemaValidator {
       throw new Error("Can only validate Object(s) or Array(s)");
     }
     this._union = union(
-      this.joinBranches(this._schema, SchemaValidator.prefix, this.schemaNodes)
+      this.joinBranches(
+        this._schema,
+        SchemaValidator.prefix,
+        this.schemaNodes,
+        !!this._schema.value.nestedRequired
+      )
     );
   }
   get schemaData(): Record<any, Partial<TypeValue<any>>[]> {
@@ -29,7 +34,8 @@ export class SchemaValidator {
   private joinBranches(
     node: Type<DataType.OBJECT | DataType.ARRAY>,
     prefix = SchemaValidator.prefix,
-    totalNodes: any = []
+    totalNodes: any = [],
+    nestedRequired?: boolean
   ) {
     let children = node.value.children;
     children?.forEach((child: TypeData<any>) => {
@@ -43,20 +49,23 @@ export class SchemaValidator {
         {
           ...child.value,
           children: typeChild?.children?.length,
+          required: !!nestedRequired || !!child.value.required,
         },
       ]);
       if (child?.value?.type === DataType.OBJECT) {
-        this.updateObjectKeys(
+        typeChild.children?.forEach(
+          (c) => (c.value.required = !!nestedRequired || !!c.value.required)
+        );
+        this.updateObjectKeys(v, typeChild.children || []);
+      }
+      if ([DataType.OBJECT, DataType.ARRAY].includes(child.value.type)) {
+        this.joinBranches(
+          child as Type<DataType.ARRAY | DataType.OBJECT>,
           v,
-          (child as Type<DataType.ARRAY | DataType.OBJECT>).value?.children ||
-            []
+          totalNodes,
+          !!nestedRequired || !!typeChild.nestedRequired
         );
       }
-      this.joinBranches(
-        child as Type<DataType.ARRAY | DataType.OBJECT>,
-        v,
-        totalNodes
-      );
     });
     totalNodes = [
       [
@@ -69,6 +78,9 @@ export class SchemaValidator {
       ...totalNodes,
     ];
     if (node.value.type === DataType.OBJECT) {
+      node.value.children?.forEach(
+        (c) => (c.value.required = !!nestedRequired || !!c.value.required)
+      );
       this.updateObjectKeys(
         SchemaValidator.prefix,
         (node?.value?.children ?? []) as Type<any>[]

@@ -14,7 +14,10 @@ export type TypeValue<T extends DataType> = {
   name?: string;
 } & (T extends DataType.STRING ? { shouldMatch?: RegExp[] } : {}) &
   (T extends DataType.OBJECT | DataType.ARRAY
-    ? { children?: TypeData<DataType>[] }
+    ? {
+        children?: TypeData<DataType>[];
+        nestedRequired?: undefined | boolean;
+      }
     : {}) &
   (T extends DataType.ARRAY ? { min?: Number; max?: Number } : {}) &
   (T extends DataType.OBJECT ? { allowUnknown?: boolean } : {});
