@@ -199,13 +199,13 @@ class JsonValidator {
           .get(prefix)
           ?.filter(
             (obj) =>
-              !objectKeys.includes((obj as any)?.name) &&
+              !objectKeys.includes(obj?.name) &&
               !!obj.required &&
-              ![DataType.ANY].includes(obj.type)
+              obj.type != DataType.ANY
           ) ?? [];
       if (missingKeys.length > 0) {
         this.collectErrors({
-          key: missingKeys.map((v) => (v as any).name),
+          key: missingKeys.map((v) => v.name),
           location: prefix_index,
           type: ErrorType.MissingKeys,
         });
