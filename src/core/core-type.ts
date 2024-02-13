@@ -1,4 +1,5 @@
-import { DataType, Type, TypeValue } from "../schema/type-core";
+import { Type } from "../schema/schema-types";
+import { DataType, TypeValue } from "../schema/type-core";
 
 export type ValidatorProps = {
   schema: Type<DataType.OBJECT | DataType.ARRAY>;

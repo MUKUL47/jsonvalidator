@@ -1,4 +1,5 @@
-import { DataType, Type, TypeData, TypeValue } from "../schema/type-core";
+import { Type } from "../schema/schema-types";
+import { DataType, TypeData, TypeValue } from "../schema/type-core";
 import { union } from "./util";
 
 export class SchemaValidator {

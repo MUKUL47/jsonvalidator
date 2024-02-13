@@ -26,23 +26,3 @@ export type TypeData<T extends DataType> = {
   value: TypeValue<T> | null;
   name?: string;
 };
-
-export class Type<T extends DataType> {
-  value: TypeValue<T>;
-  constructor(type: DataType) {
-    this.value = {
-      type,
-      required: false,
-    };
-  }
-
-  required(): this {
-    this.value.required = true;
-    return this;
-  }
-
-  example(v: any): this {
-    this.value.example = v;
-    return this;
-  }
-}

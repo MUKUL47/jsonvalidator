@@ -1,3 +1,4 @@
+import { Type } from "./schema-types";
 import {
   AnyType,
   ArrayType,
@@ -6,7 +7,7 @@ import {
   ObjectType,
   StringType,
 } from "./schema-types";
-import { DataType, Type, TypeData } from "./type-core";
+import { DataType, TypeData } from "./type-core";
 
 class Schema {
   static string() {
