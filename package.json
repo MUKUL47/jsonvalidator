@@ -1,6 +1,6 @@
 {
   "name": "anothersimplejsonvalidator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A simple and easy to use jsonvalidator",
   "main": "./dist/index.js",
   "scripts": {
