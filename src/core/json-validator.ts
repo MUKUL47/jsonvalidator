@@ -98,7 +98,10 @@ class JsonValidator {
         example: this.schemaInstance.schemaData[prefix][0].example,
       });
     }
-    if (this.schemaInstance.schemaData[prefix][0].type === DataType.ARRAY) {
+    if (
+      prefix === SchemaValidator.prefix &&
+      this.schemaInstance.schemaData[prefix][0].type === DataType.ARRAY
+    ) {
       this.checkArrayType({
         type: this.schemaInstance.schemaData[
           prefix
