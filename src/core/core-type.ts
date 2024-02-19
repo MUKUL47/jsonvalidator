@@ -24,12 +24,13 @@ export enum ErrorType {
   StringRegexMissmatch = "string_regex_missmatch",
   NumberMinExpected = "number_min_length",
   NumberMaxExpected = "number_max_length",
+  CustomValidation = "custom_validation",
 }
 
 export type ErrorControllerType = {
-  type: ErrorType;
-  key: String[];
-  location: String;
+  type?: ErrorType;
+  key?: String[];
+  location?: String;
   found?: String;
   message?: any;
   example?: any;

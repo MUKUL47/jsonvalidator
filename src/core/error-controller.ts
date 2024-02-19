@@ -14,6 +14,7 @@ export class ErrorController {
     [ErrorType.StringRegexMissmatch]: "String regex invalid",
     [ErrorType.NumberMaxExpected]: "Array length should be at most",
     [ErrorType.NumberMinExpected]: "Array length should be at least",
+    [ErrorType.CustomValidation]: "",
   };
   example: any;
   message: string;
@@ -29,10 +30,11 @@ export class ErrorController {
     this.found = found || null;
     this.example = example || null;
     this.schemaType = typevalue || null;
-    this.message =
-      errorProps.hasOwnProperty("message") && !!errorProps?.message
-        ? errorProps.message
-        : this.generateErrorMessage();
+    this.message = !!typevalue?.customErrorMessage
+      ? typevalue?.customErrorMessage
+      : errorProps.hasOwnProperty("message") && !!errorProps?.message
+      ? errorProps.message
+      : this.generateErrorMessage();
   }
 
   private generateErrorMessage() {
@@ -51,6 +53,8 @@ export class ErrorController {
         return `${msg} occurred`;
       case ErrorType.StringRegexMissmatch:
         return `${msg} for ${this.key[0] || "{$}"} at ${this.location}`;
+      case ErrorType.CustomValidation:
+        return this.message;
       case ErrorType.NumberMaxExpected:
       case ErrorType.NumberMinExpected: {
         const schemaType = this.schemaType as TypeValue<DataType.ARRAY>;

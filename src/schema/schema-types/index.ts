@@ -7,7 +7,8 @@ export class Type<T extends DataType> implements IType {
     this.value = {
       type,
       required: false,
-    };
+      customValidators: [],
+    } as TypeValue<T>;
   }
 
   required(): this {
@@ -17,6 +18,26 @@ export class Type<T extends DataType> implements IType {
 
   example(v: any): this {
     this.value.example = v;
+    return this;
+  }
+
+  addValidator(
+    onValidate: (v: any) => boolean | Promise<boolean>,
+    message?: string
+  ) {
+    if (typeof onValidate !== "function")
+      throw new Error(
+        "[addValidator] validator argument must be a function returning a boolean"
+      );
+    this.value.customValidators.push({
+      message,
+      onValidate,
+    });
+    return this;
+  }
+
+  errorMessage(m: string): this {
+    this.value.customErrorMessage = m;
     return this;
   }
 }

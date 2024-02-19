@@ -12,17 +12,32 @@ export type TypeValue<T extends DataType> = {
   required: undefined | boolean;
   example?: any;
   name?: string;
-} & (T extends DataType.STRING ? { shouldMatch?: RegExp[] } : {}) &
-  (T extends DataType.OBJECT | DataType.ARRAY
-    ? {
-        children?: TypeData<DataType>[];
-        nestedRequired?: undefined | boolean;
-      }
-    : {}) &
-  (T extends DataType.ARRAY ? { min?: Number; max?: Number } : {}) &
-  (T extends DataType.OBJECT ? { allowUnknown?: boolean } : {});
+  customValidators?: CustomValidators[];
+  customErrorMessage?: string;
+} & ExtendType<T>;
 
 export type TypeData<T extends DataType> = {
   value: TypeValue<T> | null;
   name?: string;
+};
+
+export type ExtendType<T extends DataType> = T extends DataType.STRING
+  ? StringType
+  : T extends DataType.OBJECT
+  ? RecordType & ObjectType
+  : T extends DataType.ARRAY
+  ? ObjectType & ArrayType
+  : never;
+
+type StringType = { shouldMatch?: RegExp[] };
+type ArrayType = { min?: Number; max?: Number };
+type RecordType = { allowUnknown?: boolean };
+type ObjectType = {
+  children?: TypeData<DataType>[];
+  nestedRequired?: undefined | boolean;
+};
+
+type CustomValidators = {
+  message?: string;
+  onValidate?: (v: any) => boolean | Promise<boolean>;
 };

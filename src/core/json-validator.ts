@@ -65,6 +65,7 @@ class JsonValidator {
             type: Array.isArray(node[key]) ? DataType.ARRAY : DataType.OBJECT,
             ...(Array.isArray(node) ? {} : { name: key }),
             children: [],
+            value: node[key],
           });
           startParsing(
             node[key],
@@ -179,6 +180,11 @@ class JsonValidator {
           ? child.type
           : ((child.name || child.key) as string)
       );
+      this.validateCustom(
+        schemaDataType as TypeValue<any>,
+        child,
+        prefix_index
+      );
     }
     const isArray = node.type === DataType.ARRAY;
     if (isArray) {
@@ -266,6 +272,24 @@ class JsonValidator {
         example: type.example,
       });
     }
+  }
+
+  private validateCustom(
+    typeValue: TypeValue<DataType>,
+    node: JSONObjectType,
+    prefixKeyIndex: string
+  ): void {
+    typeValue.customValidators?.forEach((customValidator) => {
+      if (!!!customValidator.onValidate?.(node.value)) {
+        this.collectErrors({
+          type: ErrorType.CustomValidation,
+          message:
+            customValidator.message ??
+            `Custom validation failed for ${prefixKeyIndex}`,
+        });
+        return;
+      }
+    });
   }
 
   private collectErrors(
