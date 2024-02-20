@@ -21,7 +21,7 @@ describe("JSONValidator: Custom validator", () => {
         S.number()
           .required()
           .example(2)
-          .addValidator((v) => v % 2 === 0, "Number must be prime!")
+          .addValidator((v) => v % 2 === 0, "Number must be even!")
       )
         .required()
         .min(5),
@@ -48,6 +48,6 @@ describe("JSONValidator: Custom validator", () => {
         name: "john doe",
         arr: ["", "", "", 1, ""],
       })
-    ).toThrow(/Number must be prime!/);
+    ).toThrow(/Number must be even!/);
   });
 });
