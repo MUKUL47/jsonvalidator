@@ -7,7 +7,7 @@ import { ObjectType } from "./schema-types/object";
 import { StringType } from "./schema-types/string";
 import { DataType, TypeData } from "./type-core";
 
-export default class Schema {
+export class Schema {
   static string() {
     return new StringType();
   }

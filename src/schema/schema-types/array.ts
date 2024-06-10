@@ -10,8 +10,8 @@ export class ArrayType
   constructor(children: TypeData<DataType>[] = []) {
     super(DataType.ARRAY);
     this.value.children = children.length === 0 ? [new AnyType()] : children;
-    const duplicateMap = new Set<DataType>;
     if (children.length > 1) {
+      const duplicateMap = new Set<DataType>();
       children.forEach((child) => {
         if (duplicateMap.has(child.value?.type as DataType)) {
           throw new Error(
