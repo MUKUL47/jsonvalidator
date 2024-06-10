@@ -22,7 +22,7 @@ export class Type<T extends DataType> implements IType {
   }
 
   addValidator(
-    onValidate: (v: any) => boolean | Promise<boolean>,
+    onValidate: (v: any) => boolean,
     message?: string
   ) {
     if (typeof onValidate !== "function")

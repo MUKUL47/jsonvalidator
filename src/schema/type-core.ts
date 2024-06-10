@@ -39,5 +39,5 @@ type ObjectType = {
 
 type CustomValidators = {
   message?: string;
-  onValidate?: (v: any) => boolean | Promise<boolean>;
+  onValidate?: (v: any) => boolean;
 };
