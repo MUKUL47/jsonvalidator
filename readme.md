@@ -44,10 +44,35 @@ This validator offers thorough validation of JSON data, ensuring it conforms to 
 3. **Create a validator instance:**
 
    ```javascript
-   const validator = new JsonValidator({
-     schema,
-     throwError: true, // Optional: Throw errors on invalid data
-   });
+    const schema = S.object({
+          name: S.string(),
+          values: S.array(
+            S.array(
+              S.array(
+                S.array(S.any(), S.boolean()),
+                S.object({
+                  someNumber: S.number(),
+                  someString: S.string(),
+                  nestedArray: S.array(
+                    S.object({
+                      nestedBoolean: S.boolean(),
+                      nestedString: S.string(),
+                      nestedNumber: S.number(),
+                      nestedObject: S.object({
+                        deeplyNestedString: S.string(),
+                        deeplyNestedNumber: S.number(),
+                      }),
+                    })
+                  ),
+                })
+              ),
+              S.string()
+            )
+          ),
+          isActive: S.boolean(),
+          count: S.number(),
+          anyValue: S.any(),
+        }).setNestedRequired();
    ```
 
 4. **Validate JSON data:**
@@ -64,6 +89,19 @@ This validator offers thorough validation of JSON data, ensuring it conforms to 
    } else {
      // Handle errors
      console.error(validationResult); // Array of ErrorController objects
+     /**
+      [
+        Y {
+          key: [ 'string' ],
+          location: 'JSON.a',
+          type: 'expected',
+          found: 'number',
+          example: null,
+          schemaType: null,
+          message: 'Expected string but found number at JSON.a'
+        }
+      ]
+      **/
    }
    ```
 
