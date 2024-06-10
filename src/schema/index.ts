@@ -1,15 +1,13 @@
 import { Type } from "./schema-types";
-import {
-  AnyType,
-  ArrayType,
-  BooleanType,
-  NumberType,
-  ObjectType,
-  StringType,
-} from "./schema-types";
+import { AnyType } from "./schema-types/any";
+import { ArrayType } from "./schema-types/array";
+import { BooleanType } from "./schema-types/boolean";
+import { NumberType } from "./schema-types/number";
+import { ObjectType } from "./schema-types/object";
+import { StringType } from "./schema-types/string";
 import { DataType, TypeData } from "./type-core";
 
-class Schema {
+export default class Schema {
   static string() {
     return new StringType();
   }
@@ -29,4 +27,3 @@ class Schema {
     return new ArrayType(children);
   }
 }
-export { Schema };

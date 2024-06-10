@@ -41,10 +41,3 @@ export class Type<T extends DataType> implements IType {
     return this;
   }
 }
-
-export * from "./any";
-export * from "./array";
-export * from "./string";
-export * from "./number";
-export * from "./object";
-export * from "./boolean";
